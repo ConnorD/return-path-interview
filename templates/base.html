@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+
+<head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% endblock %} | Return Path</title>
+</head>
+
+<body class="{{ body_class }}">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block container %}
+    <div class="main container">
+        {% block body %}
+        {% block content %}
+        {{ content }}
+        {% endblock %}
+        {% endblock %}
+    </div>
+    {% endblock %}
+    <footer class="bd-footer">
+        
+    </footer>
+
+    <div id="modal" class="modal" role="dialog" aria-hidden="true"></div>
+
+    {% block script %}
+    {% if csrf_token %}
+        <script>
+            var csrf_token = "{{ csrf_token() }}";
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+        </script>
+    {% endif %}
+    {% endblock %}
+</body>
+
+</html>
