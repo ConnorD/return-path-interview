@@ -1,0 +1,8 @@
+alembic==0.8.10
+celery==4.0.2
+Flask==0.12.1
+Flask-DebugToolbar==0.10.0
+Jinja2==2.9.5
+uWSGI==2.0.14
+Werkzeug==0.11.15
+yapf==0.22.0

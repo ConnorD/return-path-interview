@@ -1,0 +1,34 @@
+version: '2.1'
+
+services:
+  nginx:
+    container_name: rp_nginx_1
+    image: rp-nginx:latest
+    depends_on:
+      - web
+    environment:
+      HTTP_UPSTREAM_HOST: web
+      HTTP_UPSTREAM_PORT: 5000
+    links:
+      - web
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - ./tmp/logs/nginx:/var/log/nginx
+      - ./tmp/logs/uwsgi:/var/log/uwsgi
+
+  web:
+    container_name: rp_uwsgi_1
+    image: rp-uwsgi:latest
+    command: sh /dev-server.sh
+    stdin_open: true
+    tty: true
+    environment:
+      FLASK_APP: main.py
+      FLASK_DEBUG: 1
+      SEND_FILE_MAX_AGE_DEFAULT: 0
+      SESSION_MAX_AGE: 259200
+      TEMPLATES_AUTO_RELOAD: 1
+    volumes:
+      - ./:/var/code
+      - ./tmp/logs/uwsgi:/var/log/uwsgi
