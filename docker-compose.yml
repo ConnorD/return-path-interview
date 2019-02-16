@@ -1,6 +1,17 @@
 version: '2.1'
 
 services:
+  db:
+    container_name: rp_db_1
+    image: mysql:5.7.14
+    environment:
+      MYSQL_ROOT_PASSWORD: fake_password
+      MYSQL_USER: web_user
+      MYSQL_PASSWORD: fake_password
+      MYSQL_DATABASE: rp_app
+    ports:
+      - "127.0.0.1:3306:3306"
+
   nginx:
     container_name: rp_nginx_1
     image: rp-nginx:latest
@@ -21,6 +32,8 @@ services:
     container_name: rp_uwsgi_1
     image: rp-uwsgi:latest
     command: sh /dev-server.sh
+    depends_on:
+      - db
     stdin_open: true
     tty: true
     environment:

@@ -5,49 +5,64 @@ import os
 import re
 
 from flask import abort, Flask, flash, g, render_template, request, url_for
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 import gzip
 from werkzeug.utils import secure_filename
 
+from settings import UPLOAD_FOLDER, ALLOWED_EXTENSIONS
+
 logger = logging.getLogger(__name__)
 
-translation_re = re.compile('_\((.*?)\)')
+app = Flask(__name__, instance_relative_config=True)
+app.secret_key = 'super secret key'
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://web_user:fake_password@127.0.0.1:3306/rp_app'
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=True)
 
 
-UPLOAD_FOLDER = '{}/tmp'.format(os.path.dirname(os.path.realpath(__file__)))
-ALLOWED_EXTENSIONS = ['zip', 'tar']
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email_address = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(256), unique=False, nullable=True)
+
+
+log_level = logging.INFO
+logging.basicConfig(level=log_level)
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def create_app(import_name):
-    app = Flask(import_name, instance_relative_config=True)
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    print(db.session)
+    if request.method == 'POST':
+        file = request.files['uploaded_file']
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        file_ref = gzip.GzipFile(
+            os.path.join(UPLOAD_FOLDER, filename), 'r')
 
-    app.secret_key = 'super secret key'
-    app.config['SESSION_TYPE'] = 'filesystem'
+        while True:
+            line = file_ref.readline()
 
-    log_level = logging.INFO
-    logging.basicConfig(level=log_level)
+            if not line:
+                break
 
-    @app.route('/', methods=['GET', 'POST'])
-    def index():
-        if request.method == 'POST':
-            file = request.files['uploaded_file']
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            file_ref = gzip.GzipFile(
-                os.path.join(UPLOAD_FOLDER, filename), 'r')
-            
-            print(file_ref.read())
+            if 'From:' in str(line):
+                print(line)
 
-        return render_template('upload.html')
+    return render_template('upload.html')
 
-
-    @app.route('/ping/')
-    def ping():
-        return 'pong', 200
-
-    return app
-
-app = create_app(__package__.split('.')[0])
+@app.route('/ping/')
+def ping():
+    return 'pong', 200
