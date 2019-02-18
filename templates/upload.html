@@ -6,4 +6,10 @@
     <input type="file" name="uploaded_file" id="uploaded_file">
     <input type="submit" value="Upload Image" name="submit">
 </form>
+
+<ul>
+    {% for m in messages %}
+        <li>{{ m.subject }}</li>
+    {% endfor %}
+</ul>
 {% endblock %}
