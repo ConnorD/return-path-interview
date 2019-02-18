@@ -60,36 +60,6 @@ if [ "$1" = 'uwsgi' -a "$(id -u)" = '0' ]; then
 
     # Now execute under the uwsgi user
     set -- gosu uwsgi "$@"
-elif [ "$1" = 'celery-beat' -a "$(id -u)" = '0' ]; then
-    if [ -z "$CELERY_APP" ]; then
-        CELERY_APP=app.main:celery
-    fi
-
-    if [ -z "$CELERY_SCHEDULE" ]; then
-        CELERY_SCHEDULE=/tmp/celerybeat-schedule
-    fi
-
-    if [ -z "$CELERY_PID" ]; then
-        CELERY_PID=/tmp/celerybeat.pid
-    fi
-
-    if [ -z "$CELERY_LOGLEVEL" ]; then
-        CELERY_LOGLEVEL=info
-    fi
-
-    set -- gosu uwsgi celery -A $CELERY_APP beat --loglevel=$CELERY_LOGLEVEL --schedule=$CELERY_SCHEDULE --pidfile=$CELERY_PID
-
-elif [ "$1" = 'celery-worker' -a "$(id -u)" = '0' ]; then
-    if [ -z "$CELERY_APP" ]; then
-        CELERY_APP=app.main:celery
-    fi
-
-    if [ -z "$CELERY_LOGLEVEL" ]; then
-        CELERY_LOGLEVEL=info
-    fi
-
-    set -- gosu uwsgi celery -A $CELERY_APP worker --loglevel=$CELERY_LOGLEVEL
-
 fi
 
 
