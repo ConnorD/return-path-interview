@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__, instance_relative_config=True)
 app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://web_user:fake_password@db:3306/rp_app'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://{}:{}@{}:{}/{}'.format(MYSQL_USER, MYSQL_PASS, MYSQL_ADDRESS, MYSQL_PORT, MYSQL_DB)
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
