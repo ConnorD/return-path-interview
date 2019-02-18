@@ -7,9 +7,20 @@
     <input type="submit" value="Upload Image" name="submit">
 </form>
 
-<ul>
-    {% for m in messages %}
-        <li>{{ m.subject }}</li>
-    {% endfor %}
-</ul>
+<table class="table">
+    <thead>
+        <tr><th>Message-ID</th><th>To</th><th>From</th><th>Sent Date</th><th>Subject</th></tr>
+    </thead>
+    <tbody>
+        {% for m in messages %}
+            <tr>
+                <td>{{ m.message_id }}</td>
+                <td><{{ m.to_address }}></td>
+                <td>{{ m.from_name }} <{{ m.from_address }}></td>
+                <td>{{ m.sent_date }}</td>
+                <td>{{ m.subject }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
