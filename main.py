@@ -9,6 +9,7 @@ from flask import abort, Flask, flash, g, render_template, request, url_for
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import gzip
+from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 
 from settings import *
@@ -44,6 +45,7 @@ def index():
     if request.method == 'POST':
         file = request.files['uploaded_file']
         filename = secure_filename(file.filename)
+        new_directory_name = UPLOAD_FOLDER
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         
         # try to extract a tar file
@@ -60,8 +62,13 @@ def index():
 
         for msg_file_name in msg_files:
             parsed_msg = parse_msg_file(os.path.join(new_directory_name, msg_file_name))
-            new_message = Message(**parsed_msg)
-            db.session.add(new_message)
+
+            if Message.query.filter(Message.message_id == parsed_msg['message_id']).one_or_none():
+                flash('Message-ID {} has already been parsed.'.format(parsed_msg['message_id']))
+            else:
+                new_message = Message(**parsed_msg)
+                db.session.add(new_message)
+
 
         db.session.commit()
 
