@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block body %}
+{% block content %}
 <form method="post" enctype="multipart/form-data">
     Select .msg or tarfile to upload:
-    <input type="file" name="uploaded_file" id="uploaded_file">
-    <input type="submit" value="Upload File" name="submit">
+    <input type="file" name="uploaded_file" id="uploaded_file" />
+    <input type="submit" value="Upload File" name="submit" />
 </form>
 
 <table class="table">
@@ -15,8 +15,8 @@
         {% for m in messages %}
             <tr>
                 <td>{{ m.message_id }}</td>
-                <td><{{ m.to_address }}></td>
-                <td>{{ m.from_name }} <{{ m.from_address }}></td>
+                <td>{{ m.to_address }}</td>
+                <td>{{ m.from_name }} ({{ m.from_address }})</td>
                 <td>{{ m.sent_date }}</td>
                 <td>{{ m.subject }}</td>
             </tr>
