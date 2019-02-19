@@ -6,7 +6,7 @@ import re
 import tarfile
 
 from flask import abort, Flask, flash, g, render_template, request, url_for
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade as upgrade_migrate
 from flask_sqlalchemy import SQLAlchemy
 import gzip
 from sqlalchemy.exc import IntegrityError
@@ -39,6 +39,10 @@ class Message(db.Model):
 
 log_level = logging.INFO
 logging.basicConfig(level=log_level)
+
+@app.before_first_request
+def init_app():
+    upgrade_migrate()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3'
 
 services:
   db:
@@ -11,6 +11,24 @@ services:
       MYSQL_DATABASE: rp_app
     ports:
       - "3306:3306"
+
+  web:
+    container_name: rp_uwsgi_1
+    image: connordenman/return-path-interview:rp_uwsgi_1
+    command: sh ./dev-server.sh
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+    environment:
+      FLASK_APP: main.py
+      FLASK_DEBUG: 1
+      SEND_FILE_MAX_AGE_DEFAULT: 0
+      SESSION_MAX_AGE: 259200
+      TEMPLATES_AUTO_RELOAD: 1
+    volumes:
+      - ./:/var/code
+      - ./tmp/logs/uwsgi:/var/log/uwsgi
 
   nginx:
     container_name: rp_nginx_1
@@ -26,22 +44,4 @@ services:
       - "127.0.0.1:80:80"
     volumes:
       - ./tmp/logs/nginx:/var/log/nginx
-      - ./tmp/logs/uwsgi:/var/log/uwsgi
-
-  web:
-    container_name: rp_uwsgi_1
-    image: connordenman/return-path-interview:rp_uwsgi_1
-    command: sh /dev-server.sh
-    depends_on:
-      - db
-    stdin_open: true
-    tty: true
-    environment:
-      FLASK_APP: main.py
-      FLASK_DEBUG: 1
-      SEND_FILE_MAX_AGE_DEFAULT: 0
-      SESSION_MAX_AGE: 259200
-      TEMPLATES_AUTO_RELOAD: 1
-    volumes:
-      - ./:/var/code
       - ./tmp/logs/uwsgi:/var/log/uwsgi

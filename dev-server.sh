@@ -21,7 +21,6 @@ fi
 
 cd $FLASK_CODE_DIR
 set -- gosu uwsgi stdbuf -o L -e L flask run --host=0.0.0.0 --port $FLASK_HTTP_PORT
-flask db upgrade
 
 # We only want to do this when running the UWSGI command
 while /bin/true ; do
